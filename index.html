@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>PRUDENT v2.4 — LUTS Assessment</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+:root {
+  --ink: #12120f;
+  --ink-mid: #4a4a44;
+  --ink-soft: #7a7a72;
+  --ink-faint: #b0b0a8;
+  --page: #faf9f6;
+  --surface: #ffffff;
+  --surface2: #f2f1ee;
+  --rule: rgba(0,0,0,0.08);
+  --rule-mid: rgba(0,0,0,0.15);
+  --accent: #1a4f8a;
+  --accent-bg: #eef4fc;
+  --accent-light: #d4e6f8;
+  --accent-text: #0e3260;
+  --danger: #8b2020;
+  --danger-bg: #fdf0f0;
+  --danger-border: rgba(139,32,32,0.2);
+  --warn-bg: #fdf6ec;
+  --warn-text: #6b3a0a;
+  --r: 10px;
+  --r-lg: 16px;
+  --r-xl: 22px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--page);
+  color: var(--ink);
+  font-size: 15px;
+  line-height: 1.5;
+  min-height: 100vh;
+}
+
+/* ── HEADER ── */
+.header {
+  background: var(--ink);
+  padding: 0 20px;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  gap: 0;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+.logo {
+  font-family: 'DM Serif Display', serif;
+  font-size: 20px;
+  color: #fff;
+  letter-spacing: 0.05em;
+}
+.logo-dot { color: #5a9fd4; }
+.logo-sub {
+  font-size: 11px;
+  color: rgba(255,255,255,0.38);
+  margin-left: 10px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-family: 'DM Sans', sans-serif;
+}
+.header-badge {
+  margin-left: auto;
+  font-size: 10px;
+  color: rgba(255,255,255,0.3);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: 20px;
+  padding: 3px 9px;
+  letter-spacing: 0.04em;
+  font-family: 'DM Sans', sans-serif;
+}
+
+/* ── NOTICE ── */
+.notice {
+  background: var(--accent-bg);
+  border-bottom: 1px solid var(--accent-light);
+  padding: 9px 20px;
+  font-size: 12px;
+  color: var(--accent-text);
+  line-height: 1.55;
+}
+.notice strong { font-weight: 600; }
+
+/* ── TABS ── */
+.tab-bar {
+  background: var(--surface);
+  border-bottom: 1px solid var(--rule);
+  display: flex;
+  padding: 0 16px;
+  position: sticky;
+  top: 52px;
+  z-index: 40;
+}
+.tab-btn {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink-soft);
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  padding: 12px 16px 10px;
+  cursor: pointer;
+  transition: color 0.15s, border-color 0.15s;
+}
+.tab-btn:hover { color: var(--ink); }
+.tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+/* ── MAIN ── */
+.main { max-width: 640px; margin: 0 auto; padding: 20px 16px 80px; }
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+/* ── SECTION ── */
+.sec { margin-bottom: 22px; }
+.sec-label {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--ink-soft);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+  padding-bottom: 7px;
+  border-bottom: 1px solid var(--rule);
+}
+
+/* ── FIELDS ── */
+.field { margin-bottom: 11px; }
+.field:last-child { margin-bottom: 0; }
+.field-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--ink-mid);
+  margin-bottom: 5px;
+}
+.field select,
+.field input[type="number"],
+.field textarea {
+  width: 100%;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  color: var(--ink);
+  background: var(--surface);
+  border: 1px solid var(--rule-mid);
+  border-radius: var(--r);
+  padding: 9px 11px;
+  -webkit-appearance: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.field select:focus,
+.field input:focus,
+.field textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(26,79,138,0.07);
+}
+.field textarea { resize: vertical; min-height: 80px; line-height: 1.6; }
+
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.grid2 .field { margin-bottom: 0; }
+
+/* ── PVR HELPER ── */
+.pvr-hint {
+  font-size: 11px;
+  margin-top: 5px;
+  border-radius: 7px;
+  padding: 5px 9px;
+  display: none;
+}
+.pvr-hint.warn { display: block; background: var(--warn-bg); color: var(--warn-text); }
+.pvr-hint.danger { display: block; background: var(--danger-bg); color: var(--danger); }
+
+/* ── SYMPTOM CHIPS ── */
+.chip-grid { display: flex; flex-wrap: wrap; gap: 7px; }
+.chip {
+  display: inline-flex;
+  align-items: center;
+  font-size: 13px;
+  color: var(--ink-mid);
+  background: var(--surface);
+  border: 1px solid var(--rule-mid);
+  border-radius: 20px;
+  padding: 6px 14px;
+  cursor: pointer;
+  user-select: none;
+  transition: all 0.12s;
+  font-family: 'DM Sans', sans-serif;
+}
+.chip:hover { border-color: var(--accent); color: var(--accent); }
+.chip.selected {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+  font-weight: 500;
+}
+.chip.hema-chip:hover { border-color: var(--danger); color: var(--danger); }
+.chip.hema-chip.selected { background: var(--danger); border-color: var(--danger); color: #fff; }
+.chip input { display: none; }
+
+/* ── RED FLAG ALERT ── */
+.red-flag-alert {
+  display: none;
+  background: var(--danger-bg);
+  border: 1px solid var(--danger-border);
+  border-radius: var(--r);
+  padding: 10px 13px;
+  font-size: 13px;
+  color: var(--danger);
+  font-weight: 500;
+  margin-bottom: 14px;
+}
+.red-flag-alert.show { display: block; }
+
+/* ── MED STATE ── */
+.med-card {
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--r);
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+.med-card:last-child { margin-bottom: 0; }
+.med-inner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 13px;
+  flex-wrap: wrap;
+}
+.med-name {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink);
+  min-width: 150px;
+}
+.med-opts { display: flex; gap: 5px; flex-wrap: wrap; }
+.med-opt {
+  font-size: 11px;
+  font-weight: 500;
+  font-family: 'DM Sans', sans-serif;
+  padding: 4px 10px;
+  border-radius: 20px;
+  border: 1px solid var(--rule-mid);
+  background: transparent;
+  color: var(--ink-soft);
+  cursor: pointer;
+  transition: all 0.12s;
+}
+.med-opt:hover { border-color: var(--accent); color: var(--accent); }
+.med-opt.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+/* ── FREE TEXT ── */
+.ft-hint {
+  font-size: 13px;
+  color: var(--ink-soft);
+  margin-bottom: 14px;
+  line-height: 1.65;
+  padding: 10px 13px;
+  background: var(--surface2);
+  border-radius: var(--r);
+  border-left: 3px solid var(--accent-light);
+}
+.eg-label {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--ink-faint);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 7px;
+}
+.eg-list { display: flex; flex-direction: column; gap: 6px; margin-bottom: 16px; }
+.eg-item {
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  border-radius: var(--r);
+  padding: 10px 13px;
+  font-size: 12px;
+  color: var(--ink-mid);
+  cursor: pointer;
+  line-height: 1.6;
+  transition: border-color 0.12s, color 0.12s;
+}
+.eg-item:hover { border-color: var(--accent); color: var(--ink); }
+.eg-tag {
+  display: inline-block;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--ink-faint);
+  margin-bottom: 3px;
+}
+
+/* ── BUTTONS ── */
+.btn-generate {
+  width: 100%;
+  padding: 13px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  background: var(--ink);
+  color: #fff;
+  border: none;
+  border-radius: var(--r);
+  cursor: pointer;
+  transition: opacity 0.15s, transform 0.1s;
+  margin-top: 6px;
+}
+.btn-generate:hover { opacity: 0.87; }
+.btn-generate:active { transform: scale(0.99); }
+
+.btn-clear {
+  width: 100%;
+  padding: 10px;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  background: transparent;
+  border: 1px solid var(--rule-mid);
+  border-radius: var(--r);
+  color: var(--ink-soft);
+  cursor: pointer;
+  margin-top: 8px;
+  transition: background 0.12s;
+}
+.btn-clear:hover { background: var(--surface2); }
+
+.submit-note {
+  text-align: center;
+  font-size: 11px;
+  color: var(--ink-faint);
+  margin-top: 10px;
+  line-height: 1.7;
+}
+.submit-note strong { color: var(--ink-soft); font-weight: 500; }
+
+/* ── AI SELECTOR ── */
+.ai-selector {
+  display: flex;
+  background: var(--surface2);
+  border: 1px solid var(--rule-mid);
+  border-radius: var(--r-lg);
+  padding: 4px;
+  gap: 4px;
+  margin-bottom: 18px;
+}
+.ai-opt {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 9px 10px;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--ink-soft);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.ai-opt:hover { color: var(--ink); background: rgba(255,255,255,0.6); }
+.ai-opt.active {
+  background: var(--surface);
+  color: var(--ink);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+}
+.ai-opt.active.claude { color: var(--accent); }
+.ai-opt.active.gpt { color: #1a7a3e; }
+.ai-logo {
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.ai-logo.claude-logo { background: #d97706; color: #fff; }
+.ai-logo.gpt-logo { background: #1a7a3e; color: #fff; }
+.ai-selector-label {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--ink-faint);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 7px;
+}
+
+/* ── FOOTER ── */
+.page-footer {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  background: rgba(18,18,15,0.94);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  padding: 7px 16px;
+  font-size: 10px;
+  color: rgba(255,255,255,0.32);
+  text-align: center;
+  z-index: 100;
+  letter-spacing: 0.02em;
+}
+
+@media (max-width: 480px) {
+  .logo-sub { display: none; }
+  .grid2 { grid-template-columns: 1fr; }
+  .med-inner { flex-direction: column; align-items: flex-start; }
+  .med-name { min-width: unset; }
+}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <span class="logo">PRUDENT<span class="logo-dot">·</span></span>
+  <span class="logo-sub">LUTS Clinical Decision Support</span>
+  <span class="header-badge">v2.4 · ACTREC</span>
+</div>
+
+<div class="notice">
+  <strong>How to use:</strong> Fill in the case → choose Claude or ChatGPT → tap Generate → the AI opens in a new tab with the case pre-loaded → tap Send to get the PRUDENT report.
+</div>
+
+<div class="tab-bar">
+  <button class="tab-btn active" onclick="switchTab('structured', this)">Structured form</button>
+  <button class="tab-btn" onclick="switchTab('freetext', this)">Free text</button>
+</div>
+
+<div class="main">
+
+  <!-- ══════════ STRUCTURED ══════════ -->
+  <div class="tab-panel active" id="tab-structured">
+
+    <div id="rfAlert" class="red-flag-alert">
+      ⚑ Hematuria flagged — this case will be classified as RED FLAG (Hematuria-driven) and exits the standard LUTS pathway.
+    </div>
+
+    <div class="sec">
+      <div class="sec-label">Patient context</div>
+      <div class="grid2">
+        <div class="field">
+          <label class="field-label">Disease</label>
+          <select id="s-disease">
+            <option value="">— select —</option>
+            <option>Prostate</option>
+            <option>Bladder</option>
+          </select>
+        </div>
+        <div class="field">
+          <label class="field-label">RT stage</label>
+          <select id="s-rtstage">
+            <option value="">— select —</option>
+            <option>Pre-RT</option>
+            <option>Post-RT</option>
+          </select>
+        </div>
+      </div>
+      <div class="field">
+        <label class="field-label">RT timing</label>
+        <select id="s-rttiming">
+          <option value="">— not specified —</option>
+          <option>During RT</option>
+          <option>Less than 3 months post-RT</option>
+          <option>3–12 months post-RT</option>
+          <option>More than 12 months post-RT</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="sec">
+      <div class="sec-label">Symptoms — tap all that apply</div>
+      <div class="chip-grid">
+        <label class="chip" data-val="Urgency"><input type="checkbox" value="Urgency"> Urgency</label>
+        <label class="chip" data-val="Frequency"><input type="checkbox" value="Frequency"> Frequency</label>
+        <label class="chip" data-val="Nocturia"><input type="checkbox" value="Nocturia"> Nocturia</label>
+        <label class="chip" data-val="Urge incontinence"><input type="checkbox" value="Urge incontinence"> Urge incontinence</label>
+        <label class="chip" data-val="Weak stream"><input type="checkbox" value="Weak stream"> Weak stream</label>
+        <label class="chip" data-val="Hesitancy"><input type="checkbox" value="Hesitancy"> Hesitancy</label>
+        <label class="chip" data-val="Intermittency"><input type="checkbox" value="Intermittency"> Intermittency</label>
+        <label class="chip" data-val="Dysuria"><input type="checkbox" value="Dysuria"> Dysuria</label>
+        <label class="chip hema-chip" data-val="Hematuria"><input type="checkbox" value="Hematuria"> Hematuria ⚑</label>
+        <label class="chip" data-val="Straining"><input type="checkbox" value="Straining"> Straining</label>
+      </div>
+    </div>
+
+    <div class="sec">
+      <div class="sec-label">Objective data</div>
+      <div class="grid2">
+        <div class="field">
+          <label class="field-label">PVR (mL)</label>
+          <input type="number" id="s-pvr" placeholder="e.g. 80" min="0" oninput="updatePVR()">
+        </div>
+        <div class="field">
+          <label class="field-label">PVV (mL)</label>
+          <input type="number" id="s-pvv" placeholder="e.g. 300" min="0" oninput="updatePVR()">
+        </div>
+      </div>
+      <div id="pvr-hint" class="pvr-hint"></div>
+      <div class="grid2" style="margin-top:10px;">
+        <div class="field">
+          <label class="field-label">Qmax (mL/s)</label>
+          <input type="number" id="s-qmax" placeholder="e.g. 12" min="0">
+        </div>
+        <div class="field">
+          <label class="field-label">IPSS score</label>
+          <input type="number" id="s-ipss" placeholder="0–35" min="0" max="35">
+        </div>
+      </div>
+      <div class="field" style="margin-top:10px;">
+        <label class="field-label">Urine culture / microscopy</label>
+        <select id="s-urine">
+          <option value="Not done">Not done</option>
+          <option value="Negative">Negative</option>
+          <option value="UTI confirmed">UTI confirmed</option>
+          <option value="Microscopic hematuria only">Microscopic hematuria only</option>
+          <option value="Pyuria">Pyuria</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="sec">
+      <div class="sec-label">Medication state</div>
+      <div class="med-card">
+        <div class="med-inner">
+          <span class="med-name">Alpha-blocker</span>
+          <div class="med-opts" data-med="alpha">
+            <button class="med-opt" data-val="Never started">Never started</button>
+            <button class="med-opt" data-val="Current">Current</button>
+            <button class="med-opt" data-val="Failed">Failed</button>
+            <button class="med-opt" data-val="Stopped">Stopped</button>
+          </div>
+        </div>
+      </div>
+      <div class="med-card">
+        <div class="med-inner">
+          <span class="med-name">Antimuscarinic</span>
+          <div class="med-opts" data-med="antimusc">
+            <button class="med-opt" data-val="Never started">Never started</button>
+            <button class="med-opt" data-val="Current">Current</button>
+            <button class="med-opt" data-val="Failed">Failed</button>
+            <button class="med-opt" data-val="Stopped">Stopped</button>
+          </div>
+        </div>
+      </div>
+      <div class="med-card">
+        <div class="med-inner">
+          <span class="med-name">Mirabegron (beta-3)</span>
+          <div class="med-opts" data-med="beta3">
+            <button class="med-opt" data-val="Never started">Never started</button>
+            <button class="med-opt" data-val="Current">Current</button>
+            <button class="med-opt" data-val="Failed">Failed</button>
+            <button class="med-opt" data-val="Stopped">Stopped</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="sec">
+      <div class="sec-label">Additional notes (optional)</div>
+      <div class="field">
+        <textarea id="s-notes" placeholder="Cystoscopy findings, diabetes, post-prostatectomy, SBRT, clot retention, any relevant co-morbidities or history…"></textarea>
+      </div>
+    </div>
+
+    <div class="sec" style="margin-bottom:16px;">
+      <div class="ai-selector-label">Open assessment in</div>
+      <div class="ai-selector" id="ai-selector-structured">
+        <button class="ai-opt claude active" data-ai="claude" onclick="selectAI('structured','claude',this)">
+          <span class="ai-logo claude-logo">C</span> Claude
+        </button>
+        <button class="ai-opt gpt" data-ai="gpt" onclick="selectAI('structured','gpt',this)">
+          <span class="ai-logo gpt-logo">G</span> ChatGPT
+        </button>
+      </div>
+    </div>
+
+    <button class="btn-generate" onclick="submitStructured()">Generate PRUDENT Assessment →</button>
+    <button class="btn-clear" onclick="clearStructured()">Clear form</button>
+    <p class="submit-note" id="note-structured">
+      Opens <strong>Claude.ai</strong> in a new tab · Hit <strong>Send</strong> to get the report · Works with any Claude account
+    </p>
+
+  </div>
+
+  <!-- ══════════ FREE TEXT ══════════ -->
+  <div class="tab-panel" id="tab-freetext">
+
+    <div class="ft-hint">
+      Describe the case in your own words. Include disease, RT timing, symptoms, PVR, medications, and any relevant history. PRUDENT will extract all variables automatically.
+    </div>
+
+    <div class="eg-label">Tap an example to load it</div>
+    <div class="eg-list">
+      <div class="eg-item" onclick="loadEg(0)">
+        <div class="eg-tag">Voiding-dominant</div><br>
+        65M prostate cancer, 14 months post-EBRT. Weak stream, hesitancy, nocturia x2. PVR 210 mL on USS, PVV 330 mL. IPSS 23. Never started alpha-blocker. No hematuria.
+      </div>
+      <div class="eg-item" onclick="loadEg(1)">
+        <div class="eg-tag">Acute inflammatory</div><br>
+        58M prostate cancer, 6 weeks post-SBRT. Severe dysuria, frequency, urgency. PVR not done. No hematuria. No medications started yet.
+      </div>
+      <div class="eg-item" onclick="loadEg(2)">
+        <div class="eg-tag">Red flag</div><br>
+        70M bladder cancer post-RT, 10 months. Gross hematuria x3 days, mild straining. No clots passed. PVR 90 mL. On tamsulosin. Urine culture pending.
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="field-label">Case description</label>
+      <textarea id="ft-input" rows="8" placeholder="e.g. 68M prostate cancer, 9 months post-EBRT. Urgency, frequency, nocturia x3 and weak stream. PVR 160 mL, PVV 280 mL. IPSS 21. On tamsulosin 0.4 mg for 3 weeks — partial response. No hematuria. Known diabetic, HbA1c 8.2."></textarea>
+    </div>
+
+    <div style="margin-bottom:16px;">
+      <div class="ai-selector-label">Open assessment in</div>
+      <div class="ai-selector" id="ai-selector-freetext">
+        <button class="ai-opt claude active" data-ai="claude" onclick="selectAI('freetext','claude',this)">
+          <span class="ai-logo claude-logo">C</span> Claude
+        </button>
+        <button class="ai-opt gpt" data-ai="gpt" onclick="selectAI('freetext','gpt',this)">
+          <span class="ai-logo gpt-logo">G</span> ChatGPT
+        </button>
+      </div>
+    </div>
+
+    <button class="btn-generate" onclick="submitFreetext()">Generate PRUDENT Assessment →</button>
+    <p class="submit-note" id="note-freetext">
+      Opens <strong>Claude.ai</strong> in a new tab · Hit <strong>Send</strong> to get the report · Works with any Claude account
+    </p>
+
+  </div>
+
+</div>
+
+<div class="page-footer">
+  PRUDENT v2.4 · Clinical decision support only · Does not replace physician judgment · ACTREC / Tata Memorial Centre
+</div>
+
+<script>
+const medState = { alpha: null, antimusc: null, beta3: null };
+
+/* ── TABS ── */
+function switchTab(name, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  btn.classList.add('active');
+}
+
+/* ── CHIPS ── */
+document.querySelectorAll('.chip').forEach(chip => {
+  chip.addEventListener('click', function () {
+    const cb = this.querySelector('input');
+    cb.checked = !cb.checked;
+    this.classList.toggle('selected', cb.checked);
+    checkHematuria();
+  });
+});
+
+function checkHematuria() {
+  const has = Array.from(document.querySelectorAll('.chip input:checked')).some(c => c.value === 'Hematuria');
+  document.getElementById('rfAlert').classList.toggle('show', has);
+}
+
+/* ── MED BUTTONS ── */
+document.querySelectorAll('.med-opts').forEach(group => {
+  const med = group.getAttribute('data-med');
+  group.querySelectorAll('.med-opt').forEach(btn => {
+    btn.addEventListener('click', () => {
+      group.querySelectorAll('.med-opt').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      medState[med] = btn.getAttribute('data-val');
+    });
+  });
+});
+
+/* ── PVR HELPER ── */
+function updatePVR() {
+  const pvr = parseFloat(document.getElementById('s-pvr').value);
+  const pvv = parseFloat(document.getElementById('s-pvv').value);
+  const hint = document.getElementById('pvr-hint');
+  if (!pvr) { hint.className = 'pvr-hint'; hint.textContent = ''; return; }
+  if (pvr && pvv) {
+    const rf = Math.round(pvr / pvv * 100);
+    if (rf >= 33) {
+      hint.className = 'pvr-hint danger';
+      hint.textContent = '⚑ Residual fraction ' + rf + '% (≥ 33%) — significant emptying dysfunction regardless of absolute PVR';
+      return;
+    }
+  }
+  if (pvr > 150) {
+    hint.className = 'pvr-hint danger';
+    hint.textContent = '⚑ PVR > 150 mL — significant. Will trigger voiding/UAB assessment.';
+  } else if (pvr >= 50) {
+    hint.className = 'pvr-hint warn';
+    hint.textContent = 'PVR 50–150 mL — grey zone. Will be flagged in assessment.';
+  } else {
+    hint.className = 'pvr-hint';
+    hint.textContent = '';
+  }
+}
+
+/* ── PRUDENT SYSTEM PROMPT (full, embedded) ── */
+const PRUDENT_SYSTEM = `You are PRUDENT v2.4 — a clinical decision support assistant for post-/pre-radiotherapy urinary symptom assessment, developed at ACTREC, Tata Memorial Centre. You support radiation oncologists and residents managing lower urinary tract symptoms (LUTS) in prostate and bladder cancer patients.
+
+CORE RULES — apply before any output:
+1. If hematuria is present (gross or microscopic post-RT) → classify immediately as RED FLAG (Hematuria-driven). This overrides ALL other phenotyping.
+2. PVR thresholds: <50 mL = low risk · 50–150 mL = grey zone · >150 mL = significant.
+3. If PVR/PVV ≥ 33% → significant emptying dysfunction regardless of absolute PVR.
+4. High PVR overrides absence of symptoms — do not be reassured by minimal complaints (Asymptomatic High PVR Rule).
+5. Frequency alone does NOT equal OAB. Urgency must be present for storage classification.
+6. During RT or <3 months post-RT → consider Acute RT Inflammatory Override before assigning chronic phenotype.
+7. Voiding-first principle: if obstruction or emptying dysfunction suspected, address voiding before escalating storage medications.
+8. Avoid antimuscarinics if emptying is uncertain or PVR is elevated.
+9. IPSS ≥ 20 or severe urgency/incontinence → Severe Symptom Override → escalate management earlier.
+10. Medication state matters critically: never started / current / failed / stopped each changes recommendations significantly.
+
+PHENOTYPES:
+- Storage-dominant: urgency + frequency/nocturia/leakage, low PVR, minimal voiding symptoms
+- Voiding-dominant: weak stream, intermittency, hesitancy, straining, elevated PVR
+- Mixed (storage-dominant): both present, storage picture dominates
+- Mixed (voiding-dominant): both present, voiding/PVR picture dominates
+- Voiding Failure / UAB: high PVR, weak or absent stream, may be asymptomatic
+- Inflammatory: dysuria-predominant, acute RT phase, no major obstruction
+- Red Flag (Hematuria-driven): any hematuria — exits standard LUTS pathway
+
+MANAGEMENT PRINCIPLES:
+- Storage: beta-3 agonist (mirabegron) preferred; antimuscarinics only if PVR safe; add behavioral measures
+- Voiding: alpha-blocker first; uroflowmetry/urodynamics if persistent; urology referral if needed
+- Mixed: alpha-blocker first; add beta-3 cautiously once voiding addressed; always reassess emptying
+- UAB/high PVR: avoid antimuscarinics; timed/double voiding; CIC consideration; urology input
+- Inflammatory: urinary alkalizers, flavoxate, hydration, short steroid course if needed; do not over-classify as chronic
+- Red Flag: cystoscopy, imaging, infection exclusion, cytology; do not manage as routine LUTS
+
+INPUT HANDLING:
+- Accept both structured template input and free-text case descriptions
+- If free text, extract all available variables before reasoning
+- If critical data is missing (especially PVR, RT timing), explicitly note and downgrade confidence
+- Never assume PVR is safe if not provided — flag it
+
+OUTPUT FORMAT — always use this exact structure, no variations:
+
+PRUDENT ASSESSMENT
+──────────────────────────────
+Context: [Disease · RT Stage · RT Timing]
+Phenotype: [phenotype name]
+Priority: [Routine / Urgent / Emergency]
+Confidence: [High / Moderate / Low] — [one sentence reason]
+
+ASSESSMENT
+[2–3 sentence clinical summary of physiological picture and key drivers]
+
+REASONING
+• [key reasoning point 1]
+• [key reasoning point 2]
+• [key reasoning point 3]
+
+PLAN
+• [management step 1]
+• [management step 2]
+• [management step 3]
+• [management step 4]
+
+INVESTIGATIONS
+• [investigation 1]
+• [investigation 2]
+
+AVOID
+• [thing to avoid 1]
+• [thing to avoid 2]
+
+REASSESSMENT
+[Specific instruction: when to reassess, what to check, what would change management]
+──────────────────────────────
+PRUDENT v2.4 · ACTREC · Not a substitute for physician judgment`;
+
+/* ── BUILD PROMPT ── */
+function buildPrompt(caseText) {
+  return PRUDENT_SYSTEM + '\n\n---\n\nCASE:\n' + caseText;
+}
+
+/* ── AI SELECTION STATE ── */
+const aiChoice = { structured: 'claude', freetext: 'claude' };
+
+function selectAI(tab, ai, btn) {
+  aiChoice[tab] = ai;
+  const selector = document.getElementById('ai-selector-' + tab);
+  selector.querySelectorAll('.ai-opt').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  const noteId = 'note-' + tab;
+  const note = document.getElementById(noteId);
+  if (ai === 'claude') {
+    note.innerHTML = 'Opens <strong>Claude.ai</strong> in a new tab · Hit <strong>Send</strong> to get the report · Works with any Claude account';
+  } else {
+    note.innerHTML = 'Opens <strong>ChatGPT</strong> in a new tab · Hit <strong>Send</strong> to get the report · Works with any ChatGPT account';
+  }
+}
+
+function openInAI(prompt, tab) {
+  const ai = aiChoice[tab] || 'claude';
+  let url;
+  if (ai === 'gpt') {
+    url = 'https://chatgpt.com/?q=' + encodeURIComponent(prompt);
+  } else {
+    url = 'https://claude.ai/new?q=' + encodeURIComponent(prompt);
+  }
+  window.open(url, '_blank');
+}
+
+/* ── SUBMIT STRUCTURED ── */
+function submitStructured() {
+  const disease = document.getElementById('s-disease').value;
+  const rtStage = document.getElementById('s-rtstage').value;
+  if (!disease || !rtStage) {
+    alert('Please select Disease and RT Stage before generating.');
+    return;
+  }
+
+  const symptoms = Array.from(document.querySelectorAll('.chip input:checked')).map(c => c.value);
+  const pvr = document.getElementById('s-pvr').value;
+  const pvv = document.getElementById('s-pvv').value;
+  const qmax = document.getElementById('s-qmax').value;
+  const ipss = document.getElementById('s-ipss').value;
+  const urine = document.getElementById('s-urine').value;
+  const notes = document.getElementById('s-notes').value.trim();
+  const timing = document.getElementById('s-rttiming').value || 'Not specified';
+
+  let rfLine = '';
+  if (pvr && pvv) {
+    rfLine = '\nResidual fraction (PVR/PVV): ' + Math.round(parseInt(pvr) / parseInt(pvv) * 100) + '%';
+  }
+
+  const lines = [
+    'Disease: ' + disease,
+    'RT Stage: ' + rtStage,
+    'RT Timing: ' + timing,
+    'Symptoms: ' + (symptoms.length ? symptoms.join(', ') : 'None reported'),
+    'PVR: ' + (pvr ? pvr + ' mL' : 'Not provided'),
+    'PVV: ' + (pvv ? pvv + ' mL' : 'Not provided'),
+    rfLine,
+    'Qmax: ' + (qmax ? qmax + ' mL/s' : 'Not provided'),
+    'IPSS: ' + (ipss || 'Not provided'),
+    'Urine culture/microscopy: ' + urine,
+    'Alpha-blocker: ' + (medState.alpha || 'Not specified'),
+    'Antimuscarinic: ' + (medState.antimusc || 'Not specified'),
+    'Mirabegron (beta-3 agonist): ' + (medState.beta3 || 'Not specified'),
+    notes ? 'Additional notes: ' + notes : ''
+  ].filter(Boolean).join('\n');
+
+  openInAI(buildPrompt(lines), 'structured');
+}
+
+/* ── SUBMIT FREE TEXT ── */
+function submitFreetext() {
+  const text = document.getElementById('ft-input').value.trim();
+  if (!text) {
+    alert('Please describe the case before generating.');
+    return;
+  }
+  openInAI(buildPrompt(text), 'freetext');
+}
+
+/* ── CLEAR ── */
+function clearStructured() {
+  ['s-disease', 's-rtstage', 's-rttiming'].forEach(id => document.getElementById(id).value = '');
+  ['s-pvr', 's-pvv', 's-qmax', 's-ipss'].forEach(id => document.getElementById(id).value = '');
+  document.getElementById('s-urine').value = 'Not done';
+  document.getElementById('s-notes').value = '';
+  document.querySelectorAll('.chip').forEach(c => { c.classList.remove('selected'); c.querySelector('input').checked = false; });
+  document.querySelectorAll('.med-opt').forEach(b => b.classList.remove('active'));
+  Object.keys(medState).forEach(k => medState[k] = null);
+  document.getElementById('rfAlert').classList.remove('show');
+  document.getElementById('pvr-hint').className = 'pvr-hint';
+  document.getElementById('pvr-hint').textContent = '';
+}
+
+/* ── EXAMPLES ── */
+const examples = [
+  '65M prostate cancer, 14 months post-EBRT. Weak stream, hesitancy, nocturia x2. PVR 210 mL on USS, PVV 330 mL. IPSS 23. Never started alpha-blocker. No hematuria.',
+  '58M prostate cancer, 6 weeks post-SBRT. Severe dysuria, frequency, urgency. PVR not done. No hematuria. No medications started yet.',
+  '70M bladder cancer post-RT, 10 months. Gross hematuria x3 days, mild straining. No clots passed. PVR 90 mL. On tamsulosin. Urine culture pending.'
+];
+function loadEg(i) { document.getElementById('ft-input').value = examples[i]; }
+</script>
+</body>
+</html>
