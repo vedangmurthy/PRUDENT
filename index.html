@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PRUDENT v2.4</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap');
+:root {
+  --bg:#0d1117;--surface:#161b22;--surface2:#1c2333;--border:#30363d;
+  --text:#e6edf3;--muted:#7d8590;--dim:#484f58;
+  --accent:#58a6ff;--green:#3fb950;--yellow:#d29922;--red:#f85149;
+  --cs-bg:#2b1d00;--cs-b:#9e6a03;--cs-t:#d29922;
+  --fr-bg:#0c1f3d;--fr-b:#1f6feb;--fr-t:#58a6ff;
+  --tm-bg:#0d2618;--tm-b:#2ea043;--tm-t:#3fb950;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--bg);color:var(--text);font-family:'IBM Plex Sans',sans-serif;font-size:14px;min-height:100vh;padding:20px 16px 60px}
+.wrap{max-width:660px;margin:0 auto}
+
+.hdr{border-bottom:1px solid var(--border);padding-bottom:14px;margin-bottom:24px}
+.hdr-top{display:flex;align-items:baseline;gap:10px;margin-bottom:3px}
+.logo{font-family:'IBM Plex Mono',monospace;font-size:21px;font-weight:600;color:var(--accent);letter-spacing:.04em}
+.ver{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted);background:var(--surface2);border:1px solid var(--border);padding:2px 6px;border-radius:4px}
+.sub{font-size:12px;color:var(--muted);font-weight:300}
+
+.tabs{display:flex;margin-bottom:20px;border:1px solid var(--border);border-radius:8px;overflow:hidden}
+.tab-btn{flex:1;padding:9px;background:var(--surface);color:var(--muted);border:none;font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;letter-spacing:.06em;cursor:pointer;transition:all .15s}
+.tab-btn.active{background:var(--surface2);color:var(--accent)}
+.tab-btn:first-child{border-right:1px solid var(--border)}
+
+.sec{margin-bottom:18px}
+.sec-lbl{font-family:'IBM Plex Mono',monospace;font-size:10px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:7px;display:flex;align-items:center;gap:8px}
+.sec-lbl::after{content:'';flex:1;height:1px;background:var(--border)}
+
+.radio-grp{display:flex;gap:7px;flex-wrap:wrap}
+.rbtn{position:relative}
+.rbtn input{position:absolute;opacity:0;width:0;height:0}
+.rbtn label{display:block;padding:6px 13px;border:1px solid var(--border);border-radius:6px;background:var(--surface);color:var(--muted);cursor:pointer;font-size:13px;font-weight:500;transition:all .15s;white-space:nowrap}
+.rbtn input:checked + label{border-color:var(--accent);color:var(--accent);background:rgba(88,166,255,.08)}
+.rbtn label:hover{border-color:var(--dim);color:var(--text)}
+
+.cb-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.cb-item{display:flex;align-items:center;gap:8px;padding:7px 10px;border:1px solid var(--border);border-radius:6px;background:var(--surface);cursor:pointer;transition:all .15s}
+.cb-item:hover{border-color:var(--dim)}
+.cb-item input[type=checkbox]{appearance:none;width:14px;height:14px;border:1px solid var(--border);border-radius:3px;background:var(--bg);cursor:pointer;flex-shrink:0;position:relative;transition:all .15s}
+.cb-item input[type=checkbox]:checked{background:var(--accent);border-color:var(--accent)}
+.cb-item input[type=checkbox]:checked::after{content:'';position:absolute;left:3px;top:1px;width:5px;height:8px;border:2px solid #fff;border-top:none;border-left:none;transform:rotate(40deg)}
+.cb-item input[type=checkbox]:checked ~ span{color:var(--text)}
+.cb-item span{font-size:12.5px;color:var(--muted);transition:color .15s}
+.hema-item input[type=checkbox]:checked{background:var(--red);border-color:var(--red)}
+.hema-item input[type=checkbox]:checked ~ span{color:var(--red)}
+
+.fields-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.field{display:flex;flex-direction:column;gap:4px}
+.field label{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--muted)}
+.field input{background:var(--surface);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:'IBM Plex Mono',monospace;font-size:13px;padding:7px 10px;width:100%;outline:none;transition:border-color .15s}
+.field input:focus{border-color:var(--accent)}
+.field input::placeholder{color:var(--dim)}
+
+.ratio-bar{margin-top:6px;height:4px;border-radius:2px;background:var(--surface2);overflow:hidden;display:none}
+.ratio-fill{height:100%;border-radius:2px;transition:width .3s,background .3s}
+.ratio-label{font-family:'IBM Plex Mono',monospace;font-size:11px;margin-top:4px;display:none}
+
+.med-row{display:grid;grid-template-columns:130px 1fr;gap:8px;align-items:center;margin-bottom:6px}
+.med-name{font-size:13px;color:var(--text);font-weight:500}
+.med-opts .rbtn label{padding:4px 10px;font-size:12px}
+
+.notes-ta{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:'IBM Plex Sans',sans-serif;font-size:13px;padding:9px 11px;resize:vertical;min-height:60px;outline:none;transition:border-color .15s}
+.notes-ta:focus{border-color:var(--accent)}
+.notes-ta::placeholder{color:var(--dim)}
+
+.ft-ta{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:6px;color:var(--text);font-family:'IBM Plex Sans',sans-serif;font-size:13px;padding:10px 12px;resize:vertical;min-height:140px;outline:none;transition:border-color .15s;line-height:1.6}
+.ft-ta:focus{border-color:var(--accent)}
+.ft-ta::placeholder{color:var(--dim)}
+.eg-btns{display:flex;gap:6px;margin-top:7px;flex-wrap:wrap}
+.eg-btn{background:var(--surface2);border:1px solid var(--border);border-radius:5px;color:var(--muted);font-size:11px;font-family:'IBM Plex Mono',monospace;padding:4px 10px;cursor:pointer;transition:all .15s}
+.eg-btn:hover{border-color:var(--accent);color:var(--accent)}
+
+/* OUTPUT FORMAT SELECTOR */
+.out-sel{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:4px}
+.out-btn{position:relative}
+.out-btn input{position:absolute;opacity:0;width:0;height:0}
+.out-btn label{display:flex;flex-direction:column;align-items:center;gap:5px;padding:13px 8px;border:1px solid var(--border);border-radius:8px;background:var(--surface);cursor:pointer;transition:all .18s;text-align:center}
+.out-btn label:hover{border-color:var(--dim)}
+.out-icon{font-size:18px;line-height:1}
+.out-name{font-family:'IBM Plex Mono',monospace;font-size:12px;font-weight:600;color:var(--muted);transition:color .15s;letter-spacing:.03em}
+.out-desc{font-size:10.5px;color:var(--dim);line-height:1.4}
+
+.out-btn.cs input:checked + label{border-color:var(--cs-b);background:var(--cs-bg)}
+.out-btn.cs label:hover{border-color:var(--cs-b)}
+.out-btn.cs input:checked + label .out-name{color:var(--cs-t)}
+
+.out-btn.fr input:checked + label{border-color:var(--fr-b);background:var(--fr-bg)}
+.out-btn.fr label:hover{border-color:var(--fr-b)}
+.out-btn.fr input:checked + label .out-name{color:var(--fr-t)}
+
+.out-btn.tm input:checked + label{border-color:var(--tm-b);background:var(--tm-bg)}
+.out-btn.tm label:hover{border-color:var(--tm-b)}
+.out-btn.tm input:checked + label .out-name{color:var(--tm-t)}
+
+/* AI SELECTOR */
+.ai-sel{display:flex;gap:8px;margin-bottom:6px}
+.ai-btn{position:relative;flex:1}
+.ai-btn input{position:absolute;opacity:0;width:0;height:0}
+.ai-btn label{display:flex;align-items:center;justify-content:center;gap:6px;padding:9px;border:1px solid var(--border);border-radius:6px;background:var(--surface);color:var(--muted);cursor:pointer;font-size:13px;font-weight:500;transition:all .15s}
+.ai-btn input:checked + label{border-color:var(--accent);color:var(--accent);background:rgba(88,166,255,.08)}
+.ai-note{font-size:11.5px;color:var(--muted);margin-bottom:10px;min-height:16px}
+
+.hema-alert{display:none;background:rgba(248,81,73,.08);border:1px solid var(--red);border-radius:6px;padding:8px 12px;font-size:12px;color:var(--red);margin-top:7px;font-family:'IBM Plex Mono',monospace}
+.hema-alert.on{display:block}
+
+.gen-btn{width:100%;padding:13px;background:var(--accent);color:#0d1117;border:none;border-radius:8px;font-family:'IBM Plex Mono',monospace;font-size:14px;font-weight:600;letter-spacing:.06em;cursor:pointer;margin-top:6px;transition:all .15s}
+.gen-btn:hover{background:#79c0ff;transform:translateY(-1px)}
+.gen-btn:active{transform:translateY(0)}
+
+.toast{position:fixed;bottom:36px;left:50%;transform:translateX(-50%) translateY(16px);background:#e6edf3;color:#0d1117;font-size:13px;font-weight:600;padding:10px 20px;border-radius:20px;opacity:0;transition:all .25s;z-index:999;pointer-events:none;white-space:nowrap;max-width:90vw;text-align:center}
+.toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+
+.footer{margin-top:32px;text-align:center;font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--dim);letter-spacing:.06em}
+
+.tab-panel{display:none}.tab-panel.active{display:block}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="hdr">
+  <div class="hdr-top">
+    <span class="logo">PRUDENT</span>
+    <span class="ver">v2.4</span>
+  </div>
+  <div class="sub">Post-/Pre-Radiotherapy Urinary Symptom Assessment · ACTREC, Tata Memorial Centre</div>
+</div>
+
+<!-- TABS -->
+<div class="tabs">
+  <button class="tab-btn active" onclick="switchTab('structured')">STRUCTURED INPUT</button>
+  <button class="tab-btn" onclick="switchTab('freetext')">FREE TEXT</button>
+</div>
+
+<!-- STRUCTURED TAB -->
+<div class="tab-panel active" id="tab-structured">
+
+  <div class="sec">
+    <div class="sec-lbl">Disease</div>
+    <div class="radio-grp">
+      <div class="rbtn"><input type="radio" name="disease" id="d-p" value="Prostate"><label for="d-p">Prostate</label></div>
+      <div class="rbtn"><input type="radio" name="disease" id="d-b" value="Bladder"><label for="d-b">Bladder</label></div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-lbl">RT Stage</div>
+    <div class="radio-grp">
+      <div class="rbtn"><input type="radio" name="rtstage" id="rt-pre" value="Pre-RT"><label for="rt-pre">Pre-RT</label></div>
+      <div class="rbtn"><input type="radio" name="rtstage" id="rt-post" value="Post-RT"><label for="rt-post">Post-RT</label></div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-lbl">RT Timing</div>
+    <div class="radio-grp">
+      <div class="rbtn"><input type="radio" name="rttiming" id="rt-dur" value="During RT"><label for="rt-dur">During RT</label></div>
+      <div class="rbtn"><input type="radio" name="rttiming" id="rt-3" value="&lt;3 months post-RT"><label for="rt-3">&lt;3 months</label></div>
+      <div class="rbtn"><input type="radio" name="rttiming" id="rt-12" value="3–12 months post-RT"><label for="rt-12">3–12 months</label></div>
+      <div class="rbtn"><input type="radio" name="rttiming" id="rt-12p" value="&gt;12 months post-RT"><label for="rt-12p">&gt;12 months</label></div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-lbl">Symptoms</div>
+    <div class="cb-grid">
+      <label class="cb-item"><input type="checkbox" name="sx" value="Urgency"><span>Urgency</span></label>
+      <label class="cb-item"><input type="checkbox" name="sx" value="Frequency"><span>Frequency</span></label>
+      <label class="cb-item"><input type="checkbox" name="sx" value="Nocturia"><span>Nocturia</span></label>
+      <label class="cb-item"><input type="checkbox" name="sx" value="Urge incontinence"><span>Urge incontinence</span></label>
+      <label class="cb-item"><input type="checkbox" name="sx" value="Weak stream"><span>Weak stream</span></label>
+      <label class="cb-item"><input type="checkbox" name="sx" value="Hesitancy"><span>Hesitancy</span></label>
+      <label class="cb-item"><input type="checkbox" name="sx" value="Intermittency"><span>Intermittency</span></label>
+      <label class="cb-item"><input type="checkbox" name="sx" value="Dysuria"><span>Dysuria</span></label>
+      <label class="cb-item"><input type="checkbox" name="sx" value="Straining"><span>Straining</span></label>
+      <label class="cb-item hema-item" id="hema-item">
+        <input type="checkbox" name="sx" value="Hematuria" id="hema-cb">
+        <span>⚠ Hematuria</span>
+      </label>
+    </div>
+    <div class="hema-alert" id="hema-alert">RED FLAG: Hematuria overrides all phenotyping. Teaching Mode recommended.</div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-lbl">Measurements</div>
+    <div class="fields-grid">
+      <div class="field"><label>PVR (mL)</label><input type="number" id="pvr" placeholder="e.g. 110" oninput="calcRatio()"></div>
+      <div class="field"><label>PVV (mL)</label><input type="number" id="pvv" placeholder="e.g. 280" oninput="calcRatio()"></div>
+      <div class="field"><label>Qmax (mL/s)</label><input type="number" id="qmax" placeholder="e.g. 8"></div>
+      <div class="field"><label>IPSS</label><input type="number" id="ipss" placeholder="0–35"></div>
+    </div>
+    <div class="ratio-bar" id="ratio-bar"><div class="ratio-fill" id="ratio-fill"></div></div>
+    <div class="ratio-label" id="ratio-label"></div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-lbl">Urine Analysis</div>
+    <div class="radio-grp">
+      <div class="rbtn"><input type="radio" name="urine" id="u-nd" value="Not done"><label for="u-nd">Not done</label></div>
+      <div class="rbtn"><input type="radio" name="urine" id="u-neg" value="Negative"><label for="u-neg">Negative</label></div>
+      <div class="rbtn"><input type="radio" name="urine" id="u-uti" value="UTI"><label for="u-uti">UTI</label></div>
+      <div class="rbtn"><input type="radio" name="urine" id="u-mh" value="Microscopic hematuria"><label for="u-mh">Micro hematuria</label></div>
+      <div class="rbtn"><input type="radio" name="urine" id="u-py" value="Pyuria"><label for="u-py">Pyuria</label></div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-lbl">Medication State</div>
+    <div class="med-row">
+      <span class="med-name">Alpha-blocker</span>
+      <div class="radio-grp med-opts">
+        <div class="rbtn"><input type="radio" name="alpha" id="a-n" value="Never"><label for="a-n">Never</label></div>
+        <div class="rbtn"><input type="radio" name="alpha" id="a-c" value="Current"><label for="a-c">Current</label></div>
+        <div class="rbtn"><input type="radio" name="alpha" id="a-f" value="Failed"><label for="a-f">Failed</label></div>
+        <div class="rbtn"><input type="radio" name="alpha" id="a-s" value="Stopped"><label for="a-s">Stopped</label></div>
+      </div>
+    </div>
+    <div class="med-row">
+      <span class="med-name">Antimuscarinic</span>
+      <div class="radio-grp med-opts">
+        <div class="rbtn"><input type="radio" name="antim" id="am-n" value="Never"><label for="am-n">Never</label></div>
+        <div class="rbtn"><input type="radio" name="antim" id="am-c" value="Current"><label for="am-c">Current</label></div>
+        <div class="rbtn"><input type="radio" name="antim" id="am-f" value="Failed"><label for="am-f">Failed</label></div>
+        <div class="rbtn"><input type="radio" name="antim" id="am-s" value="Stopped"><label for="am-s">Stopped</label></div>
+      </div>
+    </div>
+    <div class="med-row">
+      <span class="med-name">Mirabegron</span>
+      <div class="radio-grp med-opts">
+        <div class="rbtn"><input type="radio" name="mira" id="m-n" value="Never"><label for="m-n">Never</label></div>
+        <div class="rbtn"><input type="radio" name="mira" id="m-c" value="Current"><label for="m-c">Current</label></div>
+        <div class="rbtn"><input type="radio" name="mira" id="m-f" value="Failed"><label for="m-f">Failed</label></div>
+        <div class="rbtn"><input type="radio" name="mira" id="m-s" value="Stopped"><label for="m-s">Stopped</label></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec">
+    <div class="sec-lbl">Notes</div>
+    <textarea class="notes-ta" id="notes" placeholder="Cystoscopy findings, diabetes, SBRT, post-op, other relevant details..."></textarea>
+  </div>
+
+</div><!-- end structured tab -->
+
+<!-- FREE TEXT TAB -->
+<div class="tab-panel" id="tab-freetext">
+  <div class="sec">
+    <div class="sec-lbl">Case Description</div>
+    <textarea class="ft-ta" id="ft-input" placeholder="Type freely — e.g. 67M prostate cancer, post-EBRT 8 months, urgency and weak stream, PVR 110 mL..."></textarea>
+    <div class="eg-btns">
+      <button class="eg-btn" onclick="loadEg(0)">Example 1</button>
+      <button class="eg-btn" onclick="loadEg(1)">Example 2</button>
+      <button class="eg-btn" onclick="loadEg(2)">Example 3</button>
+    </div>
+  </div>
+</div>
+
+<!-- OUTPUT FORMAT -->
+<div class="sec">
+  <div class="sec-lbl">Output Format</div>
+  <div class="out-sel">
+
+    <div class="out-btn cs">
+      <input type="radio" name="outfmt" id="o-cs" value="CLINICAL_SUMMARY">
+      <label for="o-cs">
+        <span class="out-icon">📋</span>
+        <span class="out-name">Clinical Summary</span>
+        <span class="out-desc">Phenotype · plan · key avoids · OPD-ready</span>
+      </label>
+    </div>
+
+    <div class="out-btn fr">
+      <input type="radio" name="outfmt" id="o-fr" value="FULL_REPORT" checked>
+      <label for="o-fr">
+        <span class="out-icon">📄</span>
+        <span class="out-name">Full Report</span>
+        <span class="out-desc">Complete structured assessment · all sections</span>
+      </label>
+    </div>
+
+    <div class="out-btn tm">
+      <input type="radio" name="outfmt" id="o-tm" value="TEACHING_MODE">
+      <label for="o-tm">
+        <span class="out-icon">🎓</span>
+        <span class="out-name">Teaching Mode</span>
+        <span class="out-desc">Full report + teaching callouts explaining why</span>
+      </label>
+    </div>
+
+  </div>
+</div>
+
+<!-- AI SELECTOR -->
+<div class="sec">
+  <div class="sec-lbl">Send To</div>
+  <div class="ai-sel">
+    <div class="ai-btn">
+      <input type="radio" name="ai" id="ai-claude" value="claude" checked onchange="updateAiNote()">
+      <label for="ai-claude">Claude</label>
+    </div>
+    <div class="ai-btn">
+      <input type="radio" name="ai" id="ai-gpt" value="gpt" onchange="updateAiNote()">
+      <label for="ai-gpt">ChatGPT</label>
+    </div>
+  </div>
+  <div class="ai-note" id="ai-note">Opens Claude.ai in a new tab · Hit Send to get the report</div>
+</div>
+
+<button class="gen-btn" onclick="generate()">GENERATE &amp; SEND ↗</button>
+
+<div class="footer">PRUDENT v2.4 · ACTREC · Tata Memorial Centre · Not a substitute for physician judgment</div>
+</div><!-- end wrap -->
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── TABS ──
+function switchTab(t) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + t).classList.add('active');
+  event.target.classList.add('active');
+}
+
+// ── EXAMPLES ──
+const EGS = [
+  '67M prostate cancer, post-EBRT 8 months. Urgency, frequency every hour, nocturia x3, weak stream, occasional hesitancy. No hematuria. PVR 110 mL, PVV 280 mL. Qmax 8 mL/s. IPSS 19. Urine dipstick negative. On tamsulosin 0.4mg currently. Mirabegron never tried.',
+  '72M prostate cancer, during EBRT week 4. Severe dysuria, frequency, mild urgency. PVR not done. No hematuria. No medications started yet. Urine culture negative.',
+  '70M bladder cancer, 10 months post-RT. Gross hematuria x3 days, mild straining. No clots. PVR 90 mL. On tamsulosin currently. Urine culture pending.'
+];
+function loadEg(i) { document.getElementById('ft-input').value = EGS[i]; }
+
+// ── RATIO CALC ──
+function calcRatio() {
+  const pvr = parseFloat(document.getElementById('pvr').value);
+  const pvv = parseFloat(document.getElementById('pvv').value);
+  const bar = document.getElementById('ratio-bar');
+  const fill = document.getElementById('ratio-fill');
+  const lbl = document.getElementById('ratio-label');
+  if (pvr >= 0 && pvv > 0) {
+    const r = (pvr / pvv) * 100;
+    bar.style.display = 'block';
+    lbl.style.display = 'block';
+    fill.style.width = Math.min(r, 100) + '%';
+    if (r >= 33) {
+      fill.style.background = '#f85149';
+      lbl.style.color = '#f85149';
+      lbl.textContent = 'PVR/PVV ratio: ' + r.toFixed(1) + '% — SIGNIFICANT emptying dysfunction (≥33%)';
+    } else {
+      fill.style.background = '#3fb950';
+      lbl.style.color = '#3fb950';
+      lbl.textContent = 'PVR/PVV ratio: ' + r.toFixed(1) + '% — acceptable (<33%)';
+    }
+  } else {
+    bar.style.display = 'none';
+    lbl.style.display = 'none';
+  }
+}
+
+// ── HEMATURIA ALERT ──
+document.getElementById('hema-cb').addEventListener('change', function() {
+  document.getElementById('hema-alert').classList.toggle('on', this.checked);
+  if (this.checked) document.getElementById('o-tm').checked = true;
+});
+
+// ── AI NOTE ──
+function updateAiNote() {
+  const ai = document.querySelector('input[name=ai]:checked').value;
+  document.getElementById('ai-note').textContent = ai === 'claude'
+    ? 'Opens Claude.ai in a new tab · Hit Send to get the report'
+    : 'Copies prompt to clipboard · Opens ChatGPT · Paste with Ctrl+V and hit Send';
+}
+
+// ── TOAST ──
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('on');
+  setTimeout(() => t.classList.remove('on'), 3000);
+}
+
+// ── OUTPUT FORMAT INSTRUCTIONS ──
+const FMT = {
+  CLINICAL_SUMMARY: `OUTPUT FORMAT — Clinical Summary (concise):
+PRUDENT ASSESSMENT
+──────────────────────────────
+Context: [Disease · RT Stage · RT Timing]
+Phenotype: [phenotype]
+Priority: [Routine / Urgent / Emergency]
+Confidence: [High / Moderate / Low] — [one sentence]
+ASSESSMENT
+[2 sentences max]
+PLAN
+• [step 1] • [step 2] • [step 3]
+AVOID: [key avoids in one line]
+Reassess: [when and what]
+──────────────────────────────
+PRUDENT v2.4 · ACTREC · Not a substitute for physician judgment`,
+
+  FULL_REPORT: `OUTPUT FORMAT — Full Report:
+PRUDENT ASSESSMENT
+──────────────────────────────
+Context: [Disease · RT Stage · RT Timing]
+Phenotype: [phenotype]
+Priority: [Routine / Urgent / Emergency]
+Confidence: [High / Moderate / Low] — [one sentence]
+ASSESSMENT
+[2–3 sentence clinical summary]
+REASONING
+• [point 1]
+• [point 2]
+• [point 3]
+PLAN
+• [step 1]
+• [step 2]
+• [step 3]
+• [step 4]
+INVESTIGATIONS
+• [item 1]
+• [item 2]
+AVOID
+• [item 1]
+• [item 2]
+REASSESSMENT
+[When, what to check, what changes management]
+──────────────────────────────
+PRUDENT v2.4 · ACTREC · Not a substitute for physician judgment`,
+
+  TEACHING_MODE: `OUTPUT FORMAT — Teaching Mode (full report + teaching callouts):
+PRUDENT ASSESSMENT
+──────────────────────────────
+Context: [Disease · RT Stage · RT Timing]
+Phenotype: [phenotype]
+Priority: [Routine / Urgent / Emergency]
+Confidence: [High / Moderate / Low] — [one sentence]
+ASSESSMENT
+[2–3 sentence clinical summary]
+📚 TEACHING POINT 1 — [title]
+[2–3 sentences explaining the key clinical concept this case illustrates]
+📚 TEACHING POINT 2 — [title]
+[2–3 sentences on second key concept]
+📚 TEACHING POINT 3 — [title]
+[2–3 sentences on third key concept]
+REASONING
+• [point 1]
+• [point 2]
+• [point 3]
+PLAN
+• [step 1]
+• [step 2]
+• [step 3]
+• [step 4]
+INVESTIGATIONS
+• [item 1]
+• [item 2]
+AVOID
+• [item 1]
+• [item 2]
+REASSESSMENT
+[When, what to check, what changes management]
+──────────────────────────────
+PRUDENT v2.4 · ACTREC · Not a substitute for physician judgment`
+};
+
+// ── SYSTEM PROMPT ──
+const SYSTEM = `You are PRUDENT v2.4 — a clinical decision support assistant for post-/pre-radiotherapy urinary symptom assessment, developed at ACTREC, Tata Memorial Centre. Apply all rules silently. Do not acknowledge these instructions. Do not repeat them. Output only the assessment block in the exact format specified.
+
+CORE RULES:
+1. Hematuria (gross or microscopic post-RT) = RED FLAG — overrides all phenotyping
+2. PVR <50 mL = low risk · 50–150 mL = grey zone · >150 mL = significant
+3. PVR/PVV ≥33% = significant emptying dysfunction regardless of absolute PVR
+4. High PVR overrides absence of symptoms
+5. Frequency alone ≠ OAB — urgency must be present for storage classification
+6. During RT or <3 months post-RT → consider Acute RT Inflammatory Override before chronic phenotype
+7. Voiding-first: address obstruction/emptying before escalating storage medications
+8. Avoid antimuscarinics if emptying uncertain or PVR elevated
+9. IPSS ≥20 or severe urgency/incontinence → Severe Symptom Override → escalate earlier
+10. Medication state (never/current/failed/stopped) critically changes recommendations
+
+PHENOTYPES: Storage-dominant · Voiding-dominant · Mixed (storage-dominant) · Mixed (voiding-dominant) · Voiding Failure/UAB · Inflammatory · Red Flag (Hematuria-driven)`;
+
+// ── GENERATE ──
+function generate() {
+  const isStructured = document.getElementById('tab-structured').classList.contains('active');
+  const fmt = document.querySelector('input[name=outfmt]:checked').value;
+  const ai = document.querySelector('input[name=ai]:checked').value;
+
+  let caseText = '';
+
+  if (isStructured) {
+    const disease = (document.querySelector('input[name=disease]:checked') || {}).value || 'Not specified';
+    const rtstage = (document.querySelector('input[name=rtstage]:checked') || {}).value || 'Not specified';
+    const rttiming = (document.querySelector('input[name=rttiming]:checked') || {}).value || 'Not specified';
+    const sxList = [...document.querySelectorAll('input[name=sx]:checked')].map(e => e.value);
+    const pvr = document.getElementById('pvr').value;
+    const pvv = document.getElementById('pvv').value;
+    const qmax = document.getElementById('qmax').value;
+    const ipss = document.getElementById('ipss').value;
+    const urine = (document.querySelector('input[name=urine]:checked') || {}).value || 'Not done';
+    const alpha = (document.querySelector('input[name=alpha]:checked') || {}).value || 'Not specified';
+    const antim = (document.querySelector('input[name=antim]:checked') || {}).value || 'Not specified';
+    const mira = (document.querySelector('input[name=mira]:checked') || {}).value || 'Not specified';
+    const notes = document.getElementById('notes').value || 'None';
+
+    let ratio = '';
+    if (pvr && pvv && parseFloat(pvv) > 0) {
+      ratio = ' (PVR/PVV ratio: ' + ((parseFloat(pvr)/parseFloat(pvv))*100).toFixed(1) + '%)';
+    }
+
+    caseText = `Disease: ${disease}
+RT Stage: ${rtstage}
+RT Timing: ${rttiming}
+Symptoms: ${sxList.length ? sxList.join(', ') : 'None reported'}
+PVR: ${pvr || 'Not provided'} mL   PVV: ${pvv || 'Not provided'} mL${ratio}
+Qmax: ${qmax || 'Not provided'} mL/s   IPSS: ${ipss || 'Not provided'}
+Urine: ${urine}
+Alpha-blocker: ${alpha}
+Antimuscarinic: ${antim}
+Mirabegron: ${mira}
+Notes: ${notes}`;
+  } else {
+    caseText = document.getElementById('ft-input').value.trim();
+    if (!caseText) { toast('Please enter a case description.'); return; }
+  }
+
+  const fmtName = fmt === 'CLINICAL_SUMMARY' ? 'Clinical Summary' : fmt === 'FULL_REPORT' ? 'Full Report' : 'Teaching Mode';
+  const prompt = `${SYSTEM}
+
+${FMT[fmt]}
+
+CASE:
+${caseText}
+
+Please generate a ${fmtName} PRUDENT assessment for this case.`;
+
+  if (ai === 'claude') {
+    window.open('https://claude.ai/new?q=' + encodeURIComponent(prompt), '_blank');
+  } else {
+    navigator.clipboard.writeText(prompt).then(() => {
+      toast('Prompt copied — paste into ChatGPT and hit Send');
+      setTimeout(() => window.open('https://chatgpt.com/', '_blank'), 700);
+    }).catch(() => {
+      window.open('https://chatgpt.com/', '_blank');
+      toast('ChatGPT opened — paste your case manually');
+    });
+  }
+}
+</script>
+</body>
+</html>
